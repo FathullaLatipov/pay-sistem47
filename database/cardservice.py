@@ -90,4 +90,3 @@ def change_info_card_db():
     pass
 
 # Скачать Докер
-# Прописать код для transactionservice.py
