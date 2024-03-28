@@ -54,6 +54,30 @@ def get_history_transaction(card_from_number):
     else:
         return 'Нету истории!'
 
+
 # Отмена транзакции
-# def cancel_transaction_db(card_from, card_to, amount)
-# Подсказка status=False
+def cancel_transaction_db(card_from, card_to, amount, transfer_id):
+    db = next(get_db())
+
+    # Проверка на наличии обеих карт в БД
+    checker_card_from = validate_card(card_from, db)
+    checker_card_to = validate_card(card_to, db)
+
+    if checker_card_from and checker_card_to:
+        transaction_to_cancel = db.query(Transfer).filter_by(transfer_id=transfer_id).first()
+        if transaction_to_cancel:
+            checker_card_from.balance += amount
+            checker_card_to.balance -= amount
+            transaction_to_cancel.status = False
+
+            db.delete(transaction_to_cancel)
+            db.commit()
+            
+            return 'Перевод отменен'
+        else:
+            return 'Указанный перевод не существует!'
+
+    else:
+        return 'Одна из карт не сущусвует'
+
+
